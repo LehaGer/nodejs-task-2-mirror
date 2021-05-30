@@ -1,29 +1,28 @@
 const router = require('express').Router();
-const User = require('./user.model');
-const usersService = require('./user.service');
+const boardsService = require('./board.service');
 
 router.route('/').get(async (req, res) => {
-  const users = await usersService.getAll();
-  res.json(users.map(User.toResponse));   // map user fields to exclude secret fields like "password"
+  const boards = await boardsService.getAll();
+  res.json(boards);
 });
 
 router.route('/:id').get(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const user = await usersService.getUserById(id);
-  res.json(User.toResponse(user));
+  const board = await boardsService.getBoardById(id);
+  res.json(board);
 });
 
 router.route('/').post(async (req, res) => {
-  if(usersService.createNewUser(req.body)) res.json("new user sucsesfully added");
-  else res.json("error: new user haven't been created");
+  if(boardsService.createNewBoard(req.body)) res.json("new board sucsesfully added");
+  else res.json("error: new board haven't been created");
 });
 
 router.route('/:id').put(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const userUpdatingResult = await usersService.updateUser(id, req.body);
+  const boardUpdatingResult = await boardsService.updateBoard(id, req.body);
   let textMsg = null;
   // eslint-disable-next-line no-unused-expressions
-  userUpdatingResult
+  boardUpdatingResult
     ? textMsg = "updating was sucsessful"
     : textMsg = "updating was unsucsessful";
   res.json(textMsg);
@@ -31,10 +30,10 @@ router.route('/:id').put(async (req, res) => {
 
 router.route('/:id').delete(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const deletedUser = await usersService.deleteUser(id);
+  const deletedBoard = await boardsService.deleteBoard(id);
   let textMsg = null;
   // eslint-disable-next-line no-unused-expressions
-  (deletedUser.id === id)
+  (deletedBoard.id === id)
     ? textMsg = "deleting was sucsessful"
     : textMsg = "deleting was unsucsessful"; 
   res.json(textMsg);
