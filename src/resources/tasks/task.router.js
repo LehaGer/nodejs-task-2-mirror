@@ -1,29 +1,28 @@
 const router = require('express').Router();
-const User = require('./user.model');
-const usersService = require('./user.service');
+const tasksService = require('./task.service');
 
 router.route('/').get(async (req, res) => {
-  const users = await usersService.getAll();
-  res.json(users.map(User.toResponse));   // map user fields to exclude secret fields like "password"
+  const tasks = await tasksService.getAll();
+  res.json(tasks);
 });
 
 router.route('/:id').get(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const user = await usersService.getUserById(id);
-  res.json(User.toResponse(user));
+  const task = await tasksService.getTaskById(id);
+  res.json(task);
 });
 
 router.route('/').post(async (req, res) => {
-  if(usersService.createNewUser(req.body)) res.json("new user sucsesfully added");
-  else res.json("error: new user haven't been created");
+  if(tasksService.createNewTask(req.body)) res.json("new task sucsesfully added");
+  else res.json("error: new task haven't been created");
 });
 
 router.route('/:id').put(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const userUpdatingResult = await usersService.updateUser(id, req.body);
+  const taskUpdatingResult = await tasksService.updateTask(id, req.body);
   let textMsg = null;
   // eslint-disable-next-line no-unused-expressions
-  userUpdatingResult
+  taskUpdatingResult
     ? textMsg = "updating was sucsessful"
     : textMsg = "updating was unsucsessful";
   res.json(textMsg);
@@ -31,10 +30,10 @@ router.route('/:id').put(async (req, res) => {
 
 router.route('/:id').delete(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const deletedUser = await usersService.deleteUser(id);
+  const deletedTask = await tasksService.deleteTask(id);
   let textMsg = null;
   // eslint-disable-next-line no-unused-expressions
-  (deletedUser.id === id)
+  (deletedTask.id === id)
     ? textMsg = "deleting was sucsessful"
     : textMsg = "deleting was unsucsessful"; 
   res.json(textMsg);
